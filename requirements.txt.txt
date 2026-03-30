@@ -1,9 +1,0 @@
-flask==3.0.0
-werkzeug==3.0.0
-opencv-python-headless==4.8.1.78
-numpy==1.26.0
-pandas==2.1.1
-matplotlib==3.8.0
-fpdf==1.7.2
-ultralytics==8.0.200
-ensemble-boxes==1.0.9
