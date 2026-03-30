@@ -8,7 +8,7 @@
 Official repository for the research paper: **"A Unified Edge Architecture for Construction Safety: Expert-Calibrated Spatial Fusion, REBA Ergonomics, and Automated Incident Response"** by Daksh Singla, Samayank Goel, Sarthak Vishal Luhadia, and Logeswari G.
 
 ## 📖 Abstract
-The construction industry remains disproportionately affected by fatal accidents and ergonomic injuries due to the inherent limitations of manual safety auditing. To address these critical gaps, this research proposes a unified, zero-latency cyber-physical system driven by a novel Tri-State Routing Engine. 
+The construction industry remains disproportionately affected by fatal accidents and ergonomic injuries due to the inherent limitations of manual safety auditing. To address these critical gaps, this research proposes a unified, zero-latency cyber-physical system driven by a novel Tri-State Routing Engine.
 
 By engineering a deterministically stratified dataset, the system dynamically routes inference through a hardware-aware Hybrid Ensemble of YOLO11s and YOLO11m backbones. Overlapping spatial predictions are mathematically merged using a custom **Expert-Calibrated Weighted Boxes Fusion (EC-WBF)** algorithm, achieving a peak mAP@50 of 0.910. Crucially, the system bridges passive spatial detection with active kinematic tracking by routing dynamically cropped worker tensors to a lightweight `YOLO11n-pose` network, enabling simultaneous multi-target **REBA (Rapid Entire Body Assessment)** ergonomic tracking. Finally, the architecture integrates a natively coded, asynchronous Robotic Process Automation (RPA) daemon to compile Tier 1 life-safety alerts and Tier 2 administrative compliance digests.
 
@@ -32,6 +32,35 @@ To ensure full scientific reproducibility, the foundational datasets and codebas
 ## 🚀 Installation & Setup
 
 1. **Clone the repository:**
-   ```bash
-   git clone [https://github.com/dakshSingla1904/Tri-State-Construction-Safety-CV.git](https://github.com/dakshSingla1904/Tri-State-Construction-Safety-CV.git)
+```bash
+   git clone https://github.com/dakshSingla1904/Tri-State-Construction-Safety-CV.git
    cd Tri-State-Construction-Safety-CV
+```
+
+2. **Install dependencies:**
+```bash
+   pip install -r requirements.txt
+```
+
+3. **Initialize Models:**
+   Create a folder named `weights/` in the main directory. Place your custom-trained or downloaded YOLO11 `.pt` files inside, and update the internal file paths in `app.py` to point to this directory.
+
+4. **Configure RPA Credentials:**
+   Open `app.py` and update the `SystemState` class with your local SMTP credentials (e.g., Gmail App Password) to enable automated email alerts and PDF generation. Ensure you do not commit your raw passwords to version control.
+
+5. **Run the AI Command Center:**
+```bash
+   python app.py
+```
+   Access the Flask UI/HUD by navigating to `http://localhost:5000` in your web browser.
+
+## 📜 Declarations
+**Funding:** The authors declare that no funds, grants, or other support were received during the preparation of this manuscript.
+
+**Competing Interests:** The authors have no relevant financial or non-financial interests to disclose.
+
+**Consent for Publication:** All authors have read and approved the manuscript.
+
+## 🔗 Citation
+If you utilize this architecture, code, or dataset in your research, please cite our paper:
+*(Citation details will be updated upon journal publication).*
