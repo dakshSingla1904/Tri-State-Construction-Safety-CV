@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOTA Command Center | {{ title }}</title>
+    <style>
+        body { background-color: #050505; color: #c9d1d9; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden;}
+        .sidebar { width: 330px; background-color: #0d1117; padding: 20px; overflow-y: auto; border-right: 1px solid #1f2428; box-shadow: 4px 0 15px rgba(0,0,0,0.8); z-index: 10;}
+        h2 { color: #00FFCC; font-size: 1.4rem; border-bottom: 1px solid #1f2428; padding-bottom: 10px;}
+        .nav-menu { list-style: none; padding: 0; margin-bottom: 20px;}
+        .nav-menu li { margin-bottom: 8px; }
+        .nav-menu a { text-decoration: none; color: #8b949e; display: block; padding: 10px 15px; border-radius: 6px; font-weight: bold; transition: 0.3s; border: 1px solid transparent;}
+        .nav-menu a:hover { background: #161b22; color: #00FFCC; border: 1px solid #30363d;}
+        .nav-menu a.active { background: #1f2428; color: #ffffff; border-left: 4px solid #00FFCC;}
+        .control-group { background: #161b22; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #1f2428;}
+        label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 12px; color: #8b949e; text-transform: uppercase;}
+        select, input[type="file"], input[type="text"] { width: 100%; background: #050505; color: #00FFCC; border: 1px solid #30363d; padding: 8px; border-radius: 6px; margin-bottom: 10px;}
+        input[type="range"] { width: 100%; margin-bottom: 10px; accent-color: #00FFCC; }
+        .btn-launch { background-color: #238636; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; width: 100%; cursor: pointer; margin-bottom: 10px; font-size: 14px;}
+        .btn-launch:hover { background-color: #2ea043; }
+        .btn-stop { background-color: #da3633; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; width: 100%; cursor: pointer; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 8px;}
+        .btn-stop:hover { background-color: #b32d2a; }
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; background: radial-gradient(circle at center, #111 0%, #050505 100%);}
+        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;}
+        .header-bar h1 { margin: 0; color: #fff; font-size: 22px; text-transform: uppercase; letter-spacing: 1px;}
+        .status-badge { background: #1f2428; padding: 6px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #30363d; color: #00FFCC;}
+        
+        /* Adjusted height to prevent bottom grid cutoff */
+        .video-wrapper { background: #000; border-radius: 8px; overflow: hidden; border: 1px solid #1f2428; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 55vh; max-height: 65vh; position: relative;}
+        .video-wrapper img { max-width: 100%; max-height: 65vh; object-fit: contain; }
+        
+        .recording-dot { position: absolute; top: 20px; right: 20px; background: red; width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 10px red; animation: pulse 1.5s infinite; display: none;}
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        #progressContainer { width: 80%; text-align: center; display: none; padding: 30px; background: #161b22; border-radius: 15px; border: 1px solid #30363d;}
+        .progress-bar-bg { width: 100%; background-color: #0d1117; border-radius: 10px; overflow: hidden; height: 25px; border: 1px solid #1f2428; margin-top: 15px;}
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #0077b6, #00FFCC); width: 0%; transition: width 0.4s ease;}
+        .eta-text { font-size: 14px; font-weight: bold; color: #00FFCC; margin-top: 15px;}
+
+        /* Fully responsive bottom grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(105px, 1fr)); gap: 10px; margin-top: 15px;}
+        .stat-card { background: #0d1117; padding: 12px; border-radius: 8px; border: 1px solid #1f2428; text-align: center; border-top: 3px solid #30363d;}
+        .stat-card.good { border-top-color: #238636; }
+        .stat-card.warn { border-top-color: #d29922; }
+        .stat-card.danger { border-top-color: #da3633; background: #2c0b0a;}
+        .stat-card h3 { margin: 0 0 5px 0; color: #8b949e; font-size: 11px; }
+        .stat-card .val { font-size: 22px; font-weight: bold; color: #fff; margin: 0;}
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>🌐 COMMAND CENTER</h2>
+        <ul class="nav-menu">
+            <li><a href="/unified" class="{% if mode == 'unified' %}active{% endif %}">1. Unified (PPE + Ergo)</a></li>
+            <li><a href="/ppe_all" class="{% if mode == 'ppe_all' %}active{% endif %}">2. PPE: Complete Gear</a></li>
+            <li><a href="/ergo_only" class="{% if mode == 'ergo_only' %}active{% endif %}">3. Ergonomics Only</a></li>
+            <li><a href="/cctv" class="{% if mode == 'cctv' %}active{% endif %}">4. CCTV Gatekeeper</a></li>
+        </ul>
+
+        <div class="control-group">
+            <label>AI Core Scale (Hardware)</label>
+            <select id="modelScale" onchange="switchModelScale()">
+                <option value="medium">High-Fidelity (Medium Ensemble)</option>
+                <option value="mixed">Hybrid Edge (Small + Medium)</option>
+                <option value="small">Ultra-Fast Edge (Small Alone)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>Input Source</label>
+            <select id="inputType" onchange="toggleUpload()">
+                <option value="image" {% if input_type == 'image' %}selected{% endif %}>Upload Image (.jpg/.png)</option>
+                <option value="video" {% if input_type == 'video' %}selected{% endif %}>Upload Video (Web Stream)</option>
+                <option value="bg_video" {% if input_type == 'bg_video' %}selected{% endif %}>Fast Background Export</option>
+                <option value="webcam" {% if input_type == 'webcam' %}selected{% endif %}>Live Edge Camera</option>
+            </select>
+            
+            <div id="uploadDiv" {% if input_type == 'webcam' %}style="display: none;"{% else %}style="display: block;"{% endif %}>
+                <input type="file" id="mediaFile" accept="video/*,image/*">
+                <button class="btn-launch" onclick="uploadMedia()" style="background: #1f6feb;">☁️ Upload & Process</button>
+            </div>
+        </div>
+
+        <div class="control-group" id="slidersDiv">
+            <label>Penalty Calibration</label>
+            <span style="font-size: 11px; color: #fff;">Hardhat: <span id="hVal">20</span></span>
+            <input type="range" id="wHat" min="0" max="50" value="20" onchange="updateConfig()">
+            <span style="font-size: 11px; color: #fff;">Vest: <span id="vVal">15</span></span>
+            <input type="range" id="wVest" min="0" max="50" value="15" onchange="updateConfig()">
+            <span style="font-size: 11px; color: #fff;">Mask: <span id="mVal">5</span></span>
+            <input type="range" id="wMask" min="0" max="50" value="5" onchange="updateConfig()">
+            <span style="font-size: 11px; color: #fff;">Ergonomics: <span id="eVal">15</span></span>
+            <input type="range" id="wErgo" min="0" max="50" value="15" onchange="updateConfig()">
+        </div>
+
+        <div class="control-group">
+            <label>RPA Emergency Webhook</label>
+            <input type="text" id="rpaUrl" placeholder="https://hooks.zapier.com/..." onchange="updateConfig()">
+        </div>
+
+        <button class="btn-stop" onclick="stopAndSave()" id="stopBtn">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5 3.5h6A1.5 1.5 0 0 1 12.5 5v6a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 11V5A1.5 1.5 0 0 1 5 3.5z"/></svg>
+            Stop & Save Dual-Export
+        </button>
+    </div>
+
+    <div class="main-content">
+        <div class="header-bar">
+            <h1>{{ title }}</h1>
+            <div class="status-badge" id="sysStatus">⚡ ENGINE IDLE</div>
+        </div>
+
+        <div class="video-wrapper">
+            <div class="recording-dot" id="recDot"></div>
+            <img id="videoStream" src="/video_feed" alt="Awaiting Stream...">
+            
+            <div id="progressContainer">
+                <h2 style="color:white; border-bottom:none;">Headless AI Engine Running</h2>
+                <p style="color:#8b949e; font-size:14px;">Generating Normal and Slow-Motion Exports in background.</p>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressBar"></div>
+                </div>
+                <div class="eta-text" id="etaText">0% | ETA: Calculating...</div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card good" id="card_score">
+                <h3>SCORE</h3>
+                <p class="val" id="t_score">100</p>
+            </div>
+            <div class="stat-card">
+                <h3>WORKERS</h3>
+                <p class="val" id="t_workers">0</p>
+            </div>
+            <div class="stat-card warn">
+                <h3>NO HATS</h3>
+                <p class="val" id="t_hats">0</p>
+            </div>
+            <div class="stat-card warn">
+                <h3>NO VESTS</h3>
+                <p class="val" id="t_vests">0</p>
+            </div>
+            <div class="stat-card warn">
+                <h3>NO MASKS</h3>
+                <p class="val" id="t_masks">0</p>
+            </div>
+            <div class="stat-card warn">
+                <h3>ERGO PTS</h3>
+                <p class="val" id="t_ergo">0</p>
+            </div>
+            <div class="stat-card" id="card_fall">
+                <h3>STATUS</h3>
+                <p class="val" id="t_status" style="font-size: 14px; line-height: 28px;">SAFE</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isBackgroundMode = false;
+        let bgInterval = null;
+
+        window.onload = () => {
+            document.getElementById('recDot').style.display = "block";
+            document.getElementById('sysStatus').innerText = "⚡ STREAMING";
+        };
+
+        function switchModelScale() {
+            const scale = document.getElementById("modelScale").value;
+            document.getElementById("sysStatus").innerText = "🔄 SWAPPING AI MODELS...";
+            document.getElementById("sysStatus").style.color = "#d29922";
+            fetch('/switch_models', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({scale: scale}) })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                document.getElementById("sysStatus").innerText = "⚡ AI READY";
+                document.getElementById("sysStatus").style.color = "#00FFCC";
+            });
+        }
+
+        function toggleUpload() {
+            const type = document.getElementById("inputType").value;
+            document.getElementById("uploadDiv").style.display = (type === "video" || type === "image" || type === "bg_video") ? "block" : "none";
+            if (type === "webcam") {
+                document.getElementById("sysStatus").innerText = "🔄 CONNECTING EDGE CAMERA...";
+                fetch('/set_input', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({type: 'webcam'}) })
+                .then(() => {
+                    isBackgroundMode = false;
+                    document.getElementById('progressContainer').style.display = "none";
+                    document.getElementById('videoStream').style.display = "block";
+                    document.getElementById('videoStream').src = "/video_feed?" + new Date().getTime();
+                    document.getElementById("sysStatus").innerText = "⚡ RECORDING DUAL EXPORT";
+                });
+            }
+        }
+
+        function updateConfig() {
+            document.getElementById('hVal').innerText = document.getElementById('wHat').value;
+            document.getElementById('vVal').innerText = document.getElementById('wVest').value;
+            document.getElementById('mVal').innerText = document.getElementById('wMask').value;
+            document.getElementById('eVal').innerText = document.getElementById('wErgo').value;
+            
+            fetch('/update_config', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    w_hat: document.getElementById('wHat').value,
+                    w_vest: document.getElementById('wVest').value,
+                    w_mask: document.getElementById('wMask').value,
+                    w_ergo: document.getElementById('wErgo').value,
+                    rpa_url: document.getElementById('rpaUrl').value
+                })
+            });
+        }
+
+        function uploadMedia() {
+            const file = document.getElementById("mediaFile").files[0];
+            if (!file) { alert("Please select a file first."); return; }
+            
+            const inputType = document.getElementById("inputType").value;
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("type", inputType);
+
+            document.getElementById("sysStatus").innerText = "🔄 UPLOADING & INFERENCING...";
+            document.getElementById("sysStatus").style.color = "#d29922";
+            
+            fetch('/upload', { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                if(data.error) { alert("Upload Error: " + data.error); return; }
+
+                if(inputType === "bg_video") {
+                    isBackgroundMode = true;
+                    document.getElementById('videoStream').style.display = "none";
+                    document.getElementById('recDot').style.display = "none";
+                    document.getElementById('progressContainer').style.display = "block";
+                    document.getElementById('sysStatus').innerText = "🚀 FAST PROCESSING...";
+                    if(bgInterval) clearInterval(bgInterval);
+                    bgInterval = setInterval(pollBackgroundStatus, 500);
+                } else {
+                    isBackgroundMode = false;
+                    document.getElementById('progressContainer').style.display = "none";
+                    document.getElementById('videoStream').style.display = "block";
+                    document.getElementById('videoStream').src = "/video_feed?" + new Date().getTime();
+                    document.getElementById('recDot').style.display = "block";
+                    document.getElementById("sysStatus").innerText = "⚡ RECORDING DUAL EXPORT";
+                    document.getElementById("sysStatus").style.color = "#00FFCC";
+                }
+            }).catch(err => alert("Connection error: " + err));
+        }
+
+        function pollBackgroundStatus() {
+            fetch('/bg_status')
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "processing") {
+                    let pct = Math.round((data.current / data.total) * 100);
+                    if(isNaN(pct)) pct = 0;
+                    document.getElementById('progressBar').style.width = pct + "%";
+                    document.getElementById('etaText').innerText = pct + "% | ETA: " + data.eta + " min";
+                } else if(data.status === "complete") {
+                    clearInterval(bgInterval);
+                    document.getElementById('progressBar').style.width = "100%";
+                    document.getElementById('etaText').innerText = "✅ 100% | Dual Exports Saved!";
+                    document.getElementById('sysStatus').innerText = "✅ COMPLETE";
+                    document.getElementById('sysStatus').style.color = "#3fb950";
+                    alert(data.message);
+                }
+            });
+        }
+
+        function stopAndSave() {
+            if(isBackgroundMode) { alert("Background process is running automatically."); return; }
+            document.getElementById("sysStatus").innerText = "💾 SAVING DUAL EXPORTS...";
+            document.getElementById("sysStatus").style.color = "#da3633";
+            document.getElementById('recDot').style.display = "none";
+            
+            fetch('/stop_and_save', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                document.getElementById("sysStatus").innerText = "✅ EXPORTS SAVED";
+            });
+        }
+
+        setInterval(() => {
+            if(isBackgroundMode) return; 
+            
+            fetch('/stats')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('t_score').innerText = data.score;
+                document.getElementById('t_workers').innerText = data.workers;
+                document.getElementById('t_hats').innerText = data.hats;
+                document.getElementById('t_vests').innerText = data.vests;
+                document.getElementById('t_masks').innerText = data.masks;
+                document.getElementById('t_ergo').innerText = data.ergo;
+
+                const scoreCard = document.getElementById('card_score');
+                if(data.score > 80) { scoreCard.className = "stat-card good"; document.getElementById('t_score').style.color = "#3fb950"; }
+                else if(data.score > 50) { scoreCard.className = "stat-card warn"; document.getElementById('t_score').style.color = "#d29922"; }
+                else { scoreCard.className = "stat-card danger"; document.getElementById('t_score').style.color = "#da3633"; }
+
+                const fallCard = document.getElementById('card_fall');
+                if(data.falls > 0) {
+                    fallCard.className = "stat-card danger";
+                    document.getElementById('t_status').innerText = "FALL DETECTED";
+                    document.getElementById('t_status').style.color = "#da3633";
+                } else {
+                    fallCard.className = "stat-card";
+                    document.getElementById('t_status').innerText = "SAFE";
+                    document.getElementById('t_status').style.color = "#fff";
+                }
+            }).catch(e => console.log("Waiting..."));
+        }, 500);
+    </script>
+</body>
+</html>
