@@ -21,7 +21,7 @@ By engineering a deterministically stratified dataset, the system dynamically ro
 ## 📂 Data & Weights Availability
 To ensure full scientific reproducibility, all datasets and pre-trained models are open-source:
 * **Dataset:** The mathematically stratified multi-hazard dataset (V1 Baseline through V4 Stratified) is hosted on Zenodo: `[INSERT ZENODO DATASET LINK HERE]`
-* **Model Weights:** The trained `.pt` weights for the Spatial Expert (Small), Micro/Context Experts (Medium), and Pose models are available in the **[Releases](https://github.com//dakshSingla1904/Tri-State-Construction-Safety-CV/releases)** section of this repository.
+* **Model Weights:** The trained `.pt` weights for the Spatial Expert (Small), Micro/Context Experts (Medium), and Pose models are available in the **[Releases](https://github.com/YOUR_USERNAME/Tri-State-Construction-Safety-CV/releases)** section of this repository.
 
 ## ⚙️ Hardware Requirements
 * **Minimum Edge Deployment:** Intel Core i7, NVIDIA GTX 1650 Ti (4GB VRAM) -> *Yields ~14.2 FPS on Hybrid Mode.*
@@ -31,5 +31,31 @@ To ensure full scientific reproducibility, all datasets and pre-trained models a
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/dakshSingla1904/Tri-State-Construction-Safety-CV.git](https://github.com//dakshSingla1904/Tri-State-Construction-Safety-CV.git)
+   git clone [https://github.com/YOUR_USERNAME/Tri-State-Construction-Safety-CV.git](https://github.com/YOUR_USERNAME/Tri-State-Construction-Safety-CV.git)
    cd Tri-State-Construction-Safety-CV
+Install dependencies:
+
+Bash
+pip install -r requirements.txt
+Download Model Weights:
+Download the .pt files from the GitHub Releases page. Create a folder named weights/ in the main directory and place the files inside.
+
+Configure RPA Credentials:
+Open app.py and update the SystemState class with your local SMTP credentials (e.g., Gmail App Password) to enable automated email alerts and PDF generation. Ensure you do not commit your raw passwords to version control.
+
+Run the AI Command Center:
+
+Bash
+python app.py
+Access the Flask UI/HUD by navigating to http://localhost:5000 in your web browser.
+
+📜 Declarations
+Funding: The authors declare that no funds, grants, or other support were received during the preparation of this manuscript.
+
+Competing Interests: The authors have no relevant financial or non-financial interests to disclose.
+
+Consent for Publication: All authors have read and approved the manuscript.
+
+🔗 Citation
+If you utilize this architecture, code, or dataset in your research, please cite our paper:
+(Citation details will be updated upon journal publication).
