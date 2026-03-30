@@ -21,7 +21,7 @@ By engineering a deterministically stratified dataset, the system dynamically ro
 ## 📂 Data & Weights Availability
 To ensure full scientific reproducibility, all datasets and pre-trained models are open-source:
 * **Dataset:** The mathematically stratified multi-hazard dataset (V1 Baseline through V4 Stratified) is hosted on Zenodo: `[INSERT ZENODO DATASET LINK HERE]`
-* **Model Weights:** The trained `.pt` weights for the Spatial Expert (Small), Micro/Context Experts (Medium), and Pose models are available in the **[Releases](https://github.com/YOUR_USERNAME/Tri-State-Construction-Safety-CV/releases)** section of this repository.
+* **Model Weights:** The trained `.pt` weights for the Spatial Expert (Small), Micro/Context Experts (Medium), and Pose models are available in the **[Releases](https://github.com//dakshSingla1904/Tri-State-Construction-Safety-CV/releases)** section of this repository.
 
 ## ⚙️ Hardware Requirements
 * **Minimum Edge Deployment:** Intel Core i7, NVIDIA GTX 1650 Ti (4GB VRAM) -> *Yields ~14.2 FPS on Hybrid Mode.*
@@ -31,5 +31,5 @@ To ensure full scientific reproducibility, all datasets and pre-trained models a
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/YOUR_USERNAME/Tri-State-Construction-Safety-CV.git](https://github.com/YOUR_USERNAME/Tri-State-Construction-Safety-CV.git)
+   git clone [https://github.com/dakshSingla1904/Tri-State-Construction-Safety-CV.git](https://github.com//dakshSingla1904/Tri-State-Construction-Safety-CV.git)
    cd Tri-State-Construction-Safety-CV
